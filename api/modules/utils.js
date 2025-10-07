@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { strings } from "./strings.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,7 +14,7 @@ const { greeting } = JSON.parse(
 export class CurrentDate {
     constructor(name = "Yuho") {
         this.name = this.escapeHtml(name);
-        this.greeting = greeting;
+        this.greeting = strings.greeting;
     }
 
     escapeHtml(str = "") {
