@@ -2,6 +2,7 @@ import http from "http";
 import { URL } from "url";
 import { CurrentDate } from "./modules/utils.js";
 import { FileService } from "./modules/files.js";
+import { strings } from "./modules/strings.js";
 
 const PORT = process.env.PORT || 3000;
 const fileService = new FileService();
@@ -20,21 +21,22 @@ http.createServer((req, res) => {
   }
 
   // --- writeFile ---
-  if (req.method === "GET" && url.pathname === "/COMP4537/labs/3/writeFile/") {
+  if (req.method === "POST" && url.pathname === "/COMP4537/labs/3/writeFile/") {
     const text = url.searchParams.get("text");
     if (!text) {
       res.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" });
-      res.end("Bad Request: missing ?text=...");
+      res.end(strings.badRequestMissingText);
       return;
     }
     fileService.appendLine(text, (err) => {
       if (err) {
         res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
-        res.end("Server Error: Unable to write to file");
+        res.end(strings.serverErrorWrite);
         return;
       }
       res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
-      res.end(`Appended "${text}" to file.txt`);
+      res.end(strings.appendedToFile.replace("%1", text));
+      return;
     });
     return;
   }
@@ -47,10 +49,10 @@ http.createServer((req, res) => {
       if (err) {
         if (err.code === "ENOENT") {
           res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-          res.end(`404 Not Found: file "${filename}"`);
+          res.end(strings.notFound404File.replace("%1", filename));
         } else {
           res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
-          res.end("Server Error: Unable to read file");
+          res.end(strings.serverErrorRead);
         }
         return;
       }
@@ -61,7 +63,7 @@ http.createServer((req, res) => {
   }
 
   res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-  res.end("Not Found");
+  res.end(strings.notFound);
 }).listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(strings.serverRunning.replace("%1", PORT));
 });
